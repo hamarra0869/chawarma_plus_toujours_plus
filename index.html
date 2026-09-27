@@ -5,34 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Chawarma + | Angré 8ème Tranche</title>
 
-  <!-- Meta PWA / Web App -->
-  <meta name="theme-color" content="#212126">
+  <!-- META PWA & MOBILE (iOS / ANDROID) -->
+  <meta name="theme-color" content="#1e1e24">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Chawarma+">
-  <meta name="description" content="Application de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
+  <meta name="application-name" content="Chawarma+">
+  <meta name="description" content="Application mobile de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
 
-  <!-- Manifest Inline (Data URI) -->
+  <!-- MANIFEST INLINE (DATA URI ULTRA COMPLET) -->
   <link rel="manifest" href="data:application/manifest+json;utf8,{
     %22name%22:%22Chawarma%20+%22,
     %22short_name%22:%22Chawarma+%22,
     %22start_url%22:%22index.html%22,
     %22display%22:%22standalone%22,
-    %22background_color%22:%22%23212126%22,
-    %22theme_color%22:%22%23212126%22,
-    %22icons%22:[{%22src%22:%22https://via.placeholder.com/192/d4af37/212126?text=C+%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]
+    %22background_color%22:%22%231e1e24%22,
+    %22theme_color%22:%22%231e1e24%22,
+    %22orientation%22:%22portrait%22,
+    %22icons%22:[
+      {%22src%22:%22https://via.placeholder.com/192/1e1e24/d4af37?text=CHAWARMA+%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22,%22purpose%22:%22any%22},
+      {%22src%22:%22https://via.placeholder.com/512/1e1e24/d4af37?text=CHAWARMA+%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22maskable%22}
+    ]
   }">
 
-  <!-- Icons & Fonts -->
+  <!-- ICONS APPLE HOMESCREEN -->
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/1e1e24/d4af37?text=CHAWARMA+">
+
+  <!-- FONTS & ICONES -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
   <style>
-    /* VARIABLES DE STYLE - MODE NUIT EN GRIS ADOUCI (PAR DÉFAUT) */
+    /* VARIABLES DE STYLE - MODE NUIT MAT (PAR DÉFAUT) */
     :root {
-      --bg-dark: #1e1e24;          /* Gris foncé mat ultra doux */
-      --card-bg: #282830;          /* Gris anthracite surélevé */
-      --card-inner: #32323c;       /* Gris moyen pour éléments internes */
+      --bg-dark: #1e1e24;          
+      --card-bg: #282830;          
+      --card-inner: #32323c;       
       --gold-primary: #d4af37;
       --gold-light: #fbe8a6;
       --gold-dark: #aa7c11;
@@ -45,7 +53,6 @@
       --footer-bg: #151519;
       --radius: 16px;
 
-      /* Variables d'animation du slogan - NUIT */
       --slogan-color-min: #d4af37;
       --slogan-color-max: #fff3c4;
       --slogan-glow-min: rgba(212, 175, 55, 0.15);
@@ -57,7 +64,7 @@
       --bg-dark: #f7f5f0;
       --card-bg: #ffffff;
       --card-inner: #f0ede6;
-      --gold-primary: #a37200;      /* Or plus sombre pour meilleur contraste sur fond clair */
+      --gold-primary: #a37200;      
       --gold-light: #8b6508;
       --gold-dark: #6e4e00;
       --text-light: #1c1c1e;
@@ -68,7 +75,6 @@
       --header-bg: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,245,240,0.96) 100%);
       --footer-bg: #eae7df;
 
-      /* Variables d'animation du slogan - JOUR */
       --slogan-color-min: #805700;
       --slogan-color-max: #c28c00;
       --slogan-glow-min: rgba(128, 87, 0, 0.1);
@@ -91,33 +97,75 @@
       overflow-x: hidden;
     }
 
-    /* BANNIÈRE PROMPT INSTALLATION PWA */
+    /* BANNIÈRE VIP D'INSTALLATION PWA SUR TÉLÉPHONE */
     .pwa-install-banner {
-      background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary));
-      color: #fff;
+      background: linear-gradient(135deg, var(--card-bg), #1a1a20);
+      border-bottom: 2px solid var(--gold-primary);
+      color: var(--text-light);
       padding: 12px 16px;
       display: none;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.82rem;
-      font-weight: 600;
+      gap: 10px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       animation: fadeInDown 0.4s ease forwards;
     }
 
-    .pwa-install-banner button.btn-pwa-install {
-      background: #18181d;
-      color: var(--gold-light);
-      border: 1px solid var(--gold-light);
-      padding: 6px 14px;
+    .pwa-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pwa-banner-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .pwa-banner-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pwa-banner-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+    }
+
+    .pwa-banner-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .btn-pwa-action {
+      background: linear-gradient(135deg, #fbe8a6 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+      color: #121215;
+      border: none;
+      padding: 8px 14px;
       border-radius: 20px;
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .btn-pwa-action:active {
+      transform: scale(0.92);
     }
 
     /* EN-TÊTE PRINCIPAL */
@@ -208,10 +256,10 @@
       gap: 8px;
     }
 
-    /* BOUTON D'INSTALLATION PWA HEADER */
+    /* BOUTON D'INSTALLATION DANS L'EN-TÊTE HEADER */
     .btn-header-install {
-      background: var(--card-inner);
-      border: 1px solid var(--border-gold);
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--gold-primary);
       color: var(--gold-primary);
       width: 36px;
       height: 36px;
@@ -220,12 +268,14 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.85rem;
-      transition: transform 0.2s ease;
+      font-size: 0.9rem;
+      transition: transform 0.2s ease, background-color 0.2s ease;
     }
 
     .btn-header-install:active {
       transform: scale(0.9);
+      background: var(--gold-primary);
+      color: #121215;
     }
 
     /* BOUTON TOGGLE THÈME */
@@ -248,7 +298,7 @@
       transform: scale(0.9);
     }
 
-    /* BADGE DE TABLE SOBRE & ÉLÉGANT */
+    /* BADGE DE TABLE SOBRE */
     .table-badge {
       background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(170, 124, 17, 0.05));
       border: 1px solid var(--gold-primary);
@@ -500,7 +550,7 @@
       color: var(--gold-primary);
     }
 
-    /* BOUTON AJOUTER - CHIC ET CHALEUREUX SANS BALAYAGE LUMINEUX */
+    /* BOUTON AJOUTER SOBRE */
     .btn-add {
       background: linear-gradient(135deg, #e6c863 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
       color: #121215;
@@ -738,7 +788,7 @@
       font-weight: 700;
     }
 
-    /* CARTE DE TABLE ELEGANTE ET SOBRE */
+    /* CARTE DE TABLE ELEGANTE */
     .table-btn-animated {
       background: var(--card-inner);
       border: 1px solid var(--border-gold);
@@ -792,7 +842,7 @@
       font-weight: 800;
     }
 
-    /* BOUTON STICKY / FLOTTANT "TOUJOURS PLUS" SOBRE */
+    /* BOUTON STICKY / FLOTTANT "TOUJOURS PLUS" */
     .sticky-confirm-container {
       position: sticky;
       bottom: 0;
@@ -878,6 +928,27 @@
 
     .btn-qty:active {
       transform: scale(0.85);
+    }
+
+    /* INSTRUCTIONS INSTALLATION IPHONE (iOS Safari) */
+    .ios-instructions {
+      background: var(--card-inner);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    .ios-instructions ol {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .ios-instructions li {
+      margin-bottom: 6px;
     }
 
     /* PIED DE PAGE ET CONTACTS CLIQUABLES */
@@ -975,10 +1046,18 @@
 </head>
 <body>
 
-  <!-- BANNIÈRE D'INSTALLATION PWA -->
+  <!-- BANNIÈRE VIP D'INSTALLATION PWA DU TÉLÉPHONE -->
   <div class="pwa-install-banner" id="pwaBanner">
-    <span><i class="fa-solid fa-mobile-screen"></i> Installer l'application sur votre écran d'accueil ?</span>
-    <button class="btn-pwa-install" onclick="installPWA()">Installer</button>
+    <div class="pwa-banner-content">
+      <div class="pwa-banner-icon">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <div class="pwa-banner-text">
+        <span class="pwa-banner-title">Installer Chawarma +</span>
+        <span class="pwa-banner-sub">Accès instantané depuis votre écran d'accueil</span>
+      </div>
+    </div>
+    <button class="btn-pwa-action" onclick="triggerPWAInstall()">Installer</button>
   </div>
 
   <!-- EN-TÊTE PRINCIPAL -->
@@ -993,8 +1072,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <!-- BOUTON D'INSTALLATION DANS L'EN-TÊTE -->
-      <button class="btn-header-install" id="headerInstallBtn" onclick="installPWA()" title="Installer l'application" style="display: none;">
+      <!-- BOUTON D'INSTALLATION DANS L'EN-TÊTE HEADER -->
+      <button class="btn-header-install" id="headerInstallBtn" onclick="triggerPWAInstall()" title="Installer l'application sur votre téléphone">
         <i class="fa-solid fa-download"></i>
       </button>
       <!-- BOUTON THÈME -->
@@ -1069,6 +1148,23 @@
           <i class="fa-solid fa-sparkles"></i> Valider ma table & Découvrir la carte
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL D'INSTALLATION PWA (SURTOUT SUR IPHONE/IOS) -->
+  <div class="modal-overlay" id="pwaModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title"><i class="fa-solid fa-mobile-screen"></i> Installer sur votre téléphone</span>
+        <button class="btn-close" onclick="closePWAModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="pwaModalBody">
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+          Installez l'application <strong>Chawarma +</strong> sur l'écran d'accueil de votre téléphone pour y accéder rapidement sans passer par un navigateur web.
+        </p>
+        <div id="pwaDynamicGuide"></div>
+      </div>
+      <button class="btn-confirm" onclick="closePWAModal()" style="margin-top: 16px;">Compris</button>
     </div>
   </div>
 
@@ -1296,37 +1392,88 @@
       setupPWAInstall();
     });
 
-    // PROMPT D'INSTALLATION DE L'APPLICATION (PWA)
+    // GESTION DU PROMPT ET DE L'INSTALLATION NATIVE PWA SUR TÉLÉPHONE
     function setupPWAInstall() {
+      // Détecter si l'application est déjà lancée en mode App autonome
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+      if (isStandalone) {
+        document.getElementById('pwaBanner').style.display = 'none';
+        document.getElementById('headerInstallBtn').style.display = 'none';
+        return;
+      }
+
+      // Android / Chrome
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         document.getElementById('pwaBanner').style.display = 'flex';
-        document.getElementById('headerInstallBtn').style.display = 'flex';
       });
 
+      // App installée avec succès
       window.addEventListener('appinstalled', () => {
         document.getElementById('pwaBanner').style.display = 'none';
-        document.getElementById('headerInstallBtn').style.display = 'none';
         deferredPrompt = null;
-        console.log('Application Chawarma+ installée avec succès');
+        console.log('App Chawarma+ installée avec succès !');
       });
+
+      // Si iOS Safari (qui ne prend pas en charge beforeinstallprompt)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS && !isStandalone) {
+        document.getElementById('pwaBanner').style.display = 'flex';
+      }
     }
 
-    function installPWA() {
-      if (!deferredPrompt) {
-        alert("L'installation directe n'est pas prise en charge par ce navigateur ou l'application est déjà installée. Vous pouvez l'ajouter manuellement depuis le menu de votre navigateur.");
-        return;
+    function triggerPWAInstall() {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (deferredPrompt) {
+        // Installation Android / Chrome / Windows / Mac
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+          if (choice.outcome === 'accepted') {
+            document.getElementById('pwaBanner').style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        // Guide visuel iOS Safari
+        openPWAModal('ios');
+      } else {
+        // Guide universel
+        openPWAModal('generic');
       }
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('Utilisateur a accepté l\'installation PWA');
-        }
-        document.getElementById('pwaBanner').style.display = 'none';
-        document.getElementById('headerInstallBtn').style.display = 'none';
-        deferredPrompt = null;
-      });
+    }
+
+    function openPWAModal(type) {
+      const container = document.getElementById('pwaDynamicGuide');
+      if (type === 'ios') {
+        container.innerHTML = `
+          <div class="ios-instructions">
+            <strong>Pour installer sur iPhone / iPad :</strong>
+            <ol>
+              <li>Appuyez sur le bouton <strong>Partager</strong> <i class="fa-solid fa-arrow-up-from-bracket" style="color:var(--gold-primary);"></i> au bas de votre navigateur Safari.</li>
+              <li>Faites défiler vers le bas et sélectionnez <strong>Sur l'écran d'accueil</strong> <i class="fa-regular fa-square-plus" style="color:var(--gold-primary);"></i>.</li>
+              <li>Confirmez en appuyant sur <strong>Ajouter</strong> en haut à droite.</li>
+            </ol>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="ios-instructions">
+            <strong>Pour installer l'application :</strong>
+            <ol>
+              <li>Ouvrez le menu de votre navigateur (3 petits points <i class="fa-solid fa-ellipsis-vertical"></i>).</li>
+              <li>Appuyez sur <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.</li>
+            </ol>
+          </div>
+        `;
+      }
+      document.getElementById('pwaModal').classList.add('active');
+    }
+
+    function closePWAModal() {
+      document.getElementById('pwaModal').classList.remove('active');
     }
 
     // MODE JOUR / NUIT
