@@ -2,34 +2,22 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Chawarma + | Angré 8ème Tranche</title>
 
   <!-- META PWA & MOBILE (iOS / ANDROID) -->
+  <meta name="description" content="Application mobile de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e1e24">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Chawarma+">
   <meta name="application-name" content="Chawarma+">
-  <meta name="description" content="Application mobile de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
 
-  <!-- MANIFEST INLINE (DATA URI COMPLET) -->
-  <link rel="manifest" href="data:application/manifest+json;utf8,{
-    %22name%22:%22Chawarma%20+%22,
-    %22short_name%22:%22Chawarma+%22,
-    %22start_url%22:%22index.html%22,
-    %22display%22:%22standalone%22,
-    %22background_color%22:%22%231e1e24%22,
-    %22theme_color%22:%22%231e1e24%22,
-    %22orientation%22:%22portrait%22,
-    %22icons%22:[
-      {%22src%22:%22https://via.placeholder.com/192/1e1e24/d4af37?text=CHAWARMA+%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22,%22purpose%22:%22any%22},
-      {%22src%22:%22https://via.placeholder.com/512/1e1e24/d4af37?text=CHAWARMA+%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22maskable%22}
-    ]
-  }">
-
-  <!-- ICONS APPLE HOMESCREEN -->
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/1e1e24/d4af37?text=CHAWARMA+">
+  <!-- ICÔNES -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 
   <!-- FONTS & ICONES -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -205,6 +193,16 @@
       transform: scale(0.9);
       background: var(--gold-primary);
       color: #121215;
+    }
+
+    /* HALO QUAND L'APP EST INSTALLABLE */
+    .btn-header-install.install-ready {
+      animation: pulseInstall 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseInstall {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.45); }
+      50%      { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
     }
 
     /* BOUTON TOGGLE THÈME */
@@ -1347,24 +1345,63 @@
       setupPWAInstall();
     });
 
-    // MOTEUR D'INSTALLATION PWA PAR POP-UP ÉLÉGANTE
+    /* ============================================================
+       GESTION PWA : INSTALLATION + SERVICE WORKER
+       ============================================================ */
+
+    // Enregistre le service worker (fichier sw.js à la racine)
+    function setupServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+
+      const isSecure = location.protocol === 'https:' ||
+                       ['localhost', '127.0.0.1'].includes(location.hostname);
+      if (!isSecure) {
+        console.warn('Le Service Worker exige HTTPS (ou localhost).');
+        return;
+      }
+
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js', { scope: './' })
+          .then(reg => console.log('Service Worker enregistré :', reg.scope))
+          .catch(err => console.warn('Échec Service Worker :', err));
+      });
+    }
+
+    // Prépare l'installation (Android / Chrome / Edge)
     function setupPWAInstall() {
-      // Capturer l'événement natif Chrome/Android
+      const installBtn = document.getElementById('headerInstallBtn');
+
+      // Déjà installée ? On masque le bouton.
+      if (isStandalone()) {
+        if (installBtn) installBtn.style.display = 'none';
+      }
+
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
+        if (installBtn) installBtn.classList.add('install-ready');
       });
 
       window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
+        hasPromptedPWA = true;
+        if (installBtn) {
+          installBtn.classList.remove('install-ready');
+          installBtn.style.display = 'none';
+        }
         closePWAModal();
         console.log('Chawarma+ est désormais installée !');
       });
     }
 
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.matchMedia('(display-mode: fullscreen)').matches ||
+             window.navigator.standalone === true;
+    }
+
     function openPWAModal() {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      if (isStandalone) {
+      if (isStandalone()) {
         alert("L'application Chawarma + est déjà installée sur votre écran d'accueil.");
         return;
       }
@@ -1373,14 +1410,14 @@
       const contentDiv = document.getElementById('pwaDynamicContent');
 
       if (deferredPrompt) {
-        // Mode Android / Desktop : Clic direct vers l'installateur officiel
+        // Android / Chrome / Edge : installation native en 1 clic
         contentDiv.innerHTML = `
           <button class="btn-confirm" onclick="triggerDirectInstall()">
             <i class="fa-solid fa-download"></i> Installer l'application
           </button>
         `;
       } else if (isIOS) {
-        // Mode iOS (Safari iPhone)
+        // iPhone / iPad : instructions manuelles
         contentDiv.innerHTML = `
           <div class="ios-instructions">
             <strong>Comment installer sur votre iPhone :</strong>
@@ -1399,7 +1436,7 @@
             <strong>Pour ajouter à l'écran d'accueil :</strong>
             <ol>
               <li>Ouvrez le menu de votre navigateur (3 petits points <i class="fa-solid fa-ellipsis-vertical"></i>).</li>
-              <li>Sélectionnez <strong>« Ajouter à l'écran d'accueil »</strong>.</li>
+              <li>Sélectionnez <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.</li>
             </ol>
           </div>
           <button class="btn-confirm" onclick="closePWAModal()" style="margin-top: 14px;">Compris</button>
@@ -1414,7 +1451,7 @@
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choice) => {
         if (choice.outcome === 'accepted') {
-          console.log('Prompt accepté par l\'utilisateur');
+          console.log('Installation acceptée');
         }
         deferredPrompt = null;
         closePWAModal();
@@ -1425,7 +1462,9 @@
       document.getElementById('pwaModal').classList.remove('active');
     }
 
-    // MODE JOUR / NUIT
+    /* ============================================================
+       MODE JOUR / NUIT
+       ============================================================ */
     function initTheme() {
       const savedTheme = localStorage.getItem('chawarma_theme');
       if (savedTheme === 'light') {
@@ -1445,9 +1484,14 @@
     function updateThemeIcon(isLight) {
       const btn = document.getElementById('themeToggleBtn');
       btn.innerHTML = isLight ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+      // La barre système suit le thème
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', isLight ? '#f7f5f0' : '#1e1e24');
     }
 
-    // GESTION DE LA TABLE
+    /* ============================================================
+       GESTION DE LA TABLE
+       ============================================================ */
     function initTableFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
       const tableParam = urlParams.get('table');
@@ -1481,10 +1525,9 @@
     function confirmWelcomeTable() {
       if (tempSelectedTable) {
         setTable(tempSelectedTable);
-        
+
         // PROPOSER LA POP-UP PWA UNE SEULE FOIS APRÈS LA CONFIRMATION DE TABLE
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        if (!hasPromptedPWA && !isStandalone) {
+        if (!hasPromptedPWA && !isStandalone()) {
           hasPromptedPWA = true;
           setTimeout(() => {
             openPWAModal();
@@ -1530,7 +1573,9 @@
       document.getElementById('tableModal').classList.remove('active');
     }
 
-    // MOSAÏQUE DES CATÉGORIES
+    /* ============================================================
+       MOSAÏQUE DES CATÉGORIES
+       ============================================================ */
     function renderCategories() {
       const container = document.getElementById('categoriesContainer');
       container.innerHTML = '';
@@ -1556,7 +1601,9 @@
       });
     }
 
-    // LISTE DES PRODUITS AVEC ANIMATIONS
+    /* ============================================================
+       LISTE DES PRODUITS
+       ============================================================ */
     function showProducts(catId) {
       const category = MENU_DATA.find(c => c.id === catId);
       if (!category) return;
@@ -1600,7 +1647,9 @@
       document.getElementById('categoriesView').style.display = 'block';
     }
 
-    // GESTION DES OPTIONS ET DECLINAISONS
+    /* ============================================================
+       OPTIONS ET DÉCLINAISONS
+       ============================================================ */
     function handleAddItem(catId, itemId) {
       const category = MENU_DATA.find(c => c.id === catId);
       const item = category.items.find(i => i.id === itemId);
@@ -1702,7 +1751,9 @@
       closeOptionsModal();
     }
 
-    // GESTION DU PANIER
+    /* ============================================================
+       GESTION DU PANIER
+       ============================================================ */
     function addToCart(product) {
       const existingKey = `${product.id}_${product.details}`;
       const existing = cart.find(item => item.key === existingKey);
@@ -1778,9 +1829,9 @@
             <div class="cart-item-price">${item.price.toLocaleString()} FCFA</div>
           </div>
           <div class="qty-controls">
-            <button class="btn-qty" onclick="updateCartQty('${item.key}', -1)"><i class="fa-solid fa-minus"></i></button>
+            <button class="btn-qty" onclick="updateCartQty('${item.key.replace(/'/g, "\\'")}', -1)"><i class="fa-solid fa-minus"></i></button>
             <span style="font-size: 0.85rem; font-weight:700;">${item.qty}</span>
-            <button class="btn-qty" onclick="updateCartQty('${item.key}', 1)"><i class="fa-solid fa-plus"></i></button>
+            <button class="btn-qty" onclick="updateCartQty('${item.key.replace(/'/g, "\\'")}', 1)"><i class="fa-solid fa-plus"></i></button>
           </div>
         `;
         container.appendChild(div);
@@ -1789,7 +1840,9 @@
       document.getElementById('cartModalTotal').textContent = `${totalPrice.toLocaleString()} FCFA`;
     }
 
-    // ENVOI WHATSAPP
+    /* ============================================================
+       ENVOI WHATSAPP
+       ============================================================ */
     function sendOrderWhatsApp() {
       if (!currentTable) {
         alert("Veuillez d'abord indiquer votre emplacement à notre équipe.");
@@ -1821,20 +1874,6 @@
 
       const whatsappURL = `https://wa.me/2250759071911?text=${encodeURIComponent(message)}`;
       window.open(whatsappURL, '_blank');
-    }
-
-    // SERVICE WORKER INLINE
-    function setupServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        const swCode = `
-          self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
-          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
-        `;
-        const blob = new Blob([swCode], { type: 'text/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(() => {});
-      }
     }
   </script>
 </body>
