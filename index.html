@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chawarma + | Angré 8ème Tranche</title>
+
+  <!-- Meta PWA / Web App -->
+  <meta name="theme-color" content="#212126">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Chawarma+">
+  <meta name="description" content="Application de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
+
+  <!-- Manifest Inline (Data URI) -->
+  <link rel="manifest" href="data:application/manifest+json;utf8,{
+    %22name%22:%22Chawarma%20+%22,
+    %22short_name%22:%22Chawarma+%22,
+    %22start_url%22:%22index.html%22,
+    %22display%22:%22standalone%22,
+    %22background_color%22:%22%23212126%22,
+    %22theme_color%22:%22%23212126%22,
+    %22icons%22:[{%22src%22:%22https://via.placeholder.com/192/d4af37/212126?text=C+%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]
+  }">
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    /* VARIABLES DE STYLE - MODE NUIT EN GRIS ADOUCI (PAR DÉFAUT) */
+    :root {
+      --bg-dark: #1e1e24;          /* Gris foncé mat ultra doux */
+      --card-bg: #282830;          /* Gris anthracite surélevé */
+      --card-inner: #32323c;       /* Gris moyen pour éléments internes */
+      --gold-primary: #d4af37;
+      --gold-light: #fbe8a6;
+      --gold-dark: #aa7c11;
+      --text-light: #f8f9fa;
+      --text-muted: #b0b0bc;
+      --border-gold: rgba(212, 175, 55, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --shadow-gold: 0 8px 25px rgba(212, 175, 55, 0.15);
+      --header-bg: linear-gradient(180deg, rgba(40,40,48,0.98) 0%, rgba(30,30,36,0.96) 100%);
+      --footer-bg: #151519;
+      --radius: 16px;
+
+      /* Variables d'animation du slogan - NUIT */
+      --slogan-color-min: #d4af37;
+      --slogan-color-max: #fff3c4;
+      --slogan-glow-min: rgba(212, 175, 55, 0.15);
+      --slogan-glow-max: rgba(212, 175, 55, 0.6);
+    }
+
+    /* THEME MODE JOUR */
+    body.light-mode {
+      --bg-dark: #f7f5f0;
+      --card-bg: #ffffff;
+      --card-inner: #f0ede6;
+      --gold-primary: #a37200;      /* Or plus sombre pour meilleur contraste sur fond clair */
+      --gold-light: #8b6508;
+      --gold-dark: #6e4e00;
+      --text-light: #1c1c1e;
+      --text-muted: #66666e;
+      --border-gold: rgba(163, 114, 0, 0.35);
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --shadow-gold: 0 8px 20px rgba(163, 114, 0, 0.12);
+      --header-bg: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,245,240,0.96) 100%);
+      --footer-bg: #eae7df;
+
+      /* Variables d'animation du slogan - JOUR */
+      --slogan-color-min: #805700;
+      --slogan-color-max: #c28c00;
+      --slogan-glow-min: rgba(128, 87, 0, 0.1);
+      --slogan-glow-max: rgba(194, 140, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      padding-bottom: 110px;
+      overflow-x: hidden;
+    }
+
+    /* BANNIÈRE PROMPT INSTALLATION PWA */
+    .pwa-install-banner {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary));
+      color: #fff;
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      animation: fadeInDown 0.4s ease forwards;
+    }
+
+    .pwa-install-banner button.btn-pwa-install {
+      background: #18181d;
+      color: var(--gold-light);
+      border: 1px solid var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* EN-TÊTE PRINCIPAL */
+    header {
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold-primary);
+      background: #18181d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-primary);
+      box-shadow: var(--shadow-gold);
+      animation: logoGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes logoGlow {
+      0% { 
+        box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+        transform: scale(1);
+      }
+      100% { 
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        transform: scale(1.02);
+      }
+    }
+
+    .brand-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold-primary);
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    /* SLOGAN "TOUJOURS PLUS" */
+    .brand-title p {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      margin-top: 2px;
+      display: inline-block;
+      animation: sloganBreathe 3.2s infinite ease-in-out;
+    }
+
+    @keyframes sloganBreathe {
+      0% {
+        color: var(--slogan-color-min);
+        text-shadow: 0 0 2px var(--slogan-glow-min);
+        opacity: 0.85;
+      }
+      50% {
+        color: var(--slogan-color-max);
+        text-shadow: 0 0 6px var(--slogan-glow-max);
+        opacity: 1;
+      }
+      100% {
+        color: var(--slogan-color-min);
+        text-shadow: 0 0 2px var(--slogan-glow-min);
+        opacity: 0.85;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* BOUTON D'INSTALLATION PWA HEADER */
+    .btn-header-install {
+      background: var(--card-inner);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-header-install:active {
+      transform: scale(0.9);
+    }
+
+    /* BOUTON TOGGLE THÈME */
+    .theme-toggle {
+      background: var(--card-inner);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: transform 0.2s ease;
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.9);
+    }
+
+    /* BADGE DE TABLE SOBRE & ÉLÉGANT */
+    .table-badge {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(170, 124, 17, 0.05));
+      border: 1px solid var(--gold-primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .table-badge:active {
+      transform: scale(0.95);
+    }
+
+    /* BANNIÈRE D'INFORMATION */
+    .info-banner {
+      margin: 14px 16px;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border-left: 3px solid var(--gold-primary);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      animation: fadeIn 0.5s ease;
+    }
+
+    /* TITRE DE SECTION */
+    .section-header {
+      margin: 22px 16px 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title i {
+      color: var(--gold-primary);
+    }
+
+    /* MOSAÏQUE DES CATÉGORIES (GRILLE 2 COLONNES) */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      padding: 0 16px;
+    }
+
+    .category-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .category-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold-primary);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .category-card:active {
+      transform: scale(0.97);
+    }
+
+    .category-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 110px;
+      overflow: hidden;
+    }
+
+    .category-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .category-card:hover .category-img-wrapper img {
+      transform: scale(1.08);
+    }
+
+    .category-img-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 25%, var(--card-bg) 100%);
+    }
+
+    .category-info {
+      padding: 10px 12px 14px 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .category-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--card-inner);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      margin-top: -24px;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover .category-icon {
+      transform: scale(1.1);
+      border-color: var(--gold-primary);
+    }
+
+    .category-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    .category-count {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* VUE PRODUITS / LISTE AVEC PHOTOS DES PLATS */
+    .view-products {
+      display: none;
+      padding: 0 16px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-primary);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-back:active {
+      transform: translateX(-4px);
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      animation: fadeInUp 0.35s ease forwards;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .product-card:hover {
+      border-color: var(--border-gold);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    .product-card:active {
+      transform: scale(0.98);
+    }
+
+    .product-img {
+      width: 105px;
+      height: 105px;
+      object-fit: cover;
+      flex-shrink: 0;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+
+    .product-content {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .product-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .product-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .product-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .product-price {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+    }
+
+    /* BOUTON AJOUTER - CHIC ET CHALEUREUX SANS BALAYAGE LUMINEUX */
+    .btn-add {
+      background: linear-gradient(135deg, #e6c863 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+      color: #121215;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 10px rgba(212, 175, 55, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-add:hover {
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-add:active {
+      transform: scale(0.94);
+    }
+
+    /* BARRE FLOTTANTE DU PANIER */
+    .cart-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, #fbe8a6 0%, #d4af37 50%, #aa7c11 100%);
+      color: #121215;
+      padding: 14px 22px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35);
+      animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.2s ease;
+    }
+
+    .cart-bar:active {
+      transform: scale(0.97);
+    }
+
+    .cart-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cart-badge {
+      background: #121215;
+      color: var(--gold-light);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      border: 1px solid var(--gold-primary);
+      animation: pop 0.3s ease;
+    }
+
+    .cart-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .cart-total {
+      font-size: 0.98rem;
+      font-weight: 800;
+    }
+
+    .cart-action {
+      font-size: 0.88rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* FENÊTRES MODALES */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-top: 2px solid var(--gold-primary);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 500px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 24px 20px 20px 20px;
+      position: relative;
+      animation: slideUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+    }
+
+    /* DESIGN MODALE DE BIENVENUE VIP */
+    .welcome-header {
+      text-align: center;
+      padding: 10px 0 16px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .welcome-badge-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(170, 124, 17, 0.05));
+      border: 1.5px solid var(--gold-primary);
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin: 0 auto 10px auto;
+      box-shadow: var(--shadow-gold);
+    }
+
+    .welcome-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--gold-primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .welcome-slogan {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--slogan-color-max);
+      margin-bottom: 8px;
+    }
+
+    .welcome-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      max-width: 90%;
+      margin: 0 auto;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-close:active {
+      transform: rotate(90deg);
+    }
+
+    .option-group {
+      margin-bottom: 16px;
+    }
+
+    .option-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .option-btn {
+      background: var(--card-inner);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn.selected {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold-primary);
+      font-weight: 700;
+    }
+
+    /* CARTE DE TABLE ELEGANTE ET SOBRE */
+    .table-btn-animated {
+      background: var(--card-inner);
+      border: 1px solid var(--border-gold);
+      color: var(--text-light);
+      padding: 12px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .table-btn-number {
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--gold-light);
+    }
+
+    .table-btn-sub {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table-btn-animated:hover {
+      border-color: var(--gold-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+    }
+
+    /* TABLE SÉLECTIONNÉE */
+    .table-btn-animated.selected {
+      background: linear-gradient(135deg, #fbe8a6 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+      color: #121215;
+      border-color: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .table-btn-animated.selected .table-btn-number,
+    .table-btn-animated.selected .table-btn-sub {
+      color: #121215;
+      font-weight: 800;
+    }
+
+    /* BOUTON STICKY / FLOTTANT "TOUJOURS PLUS" SOBRE */
+    .sticky-confirm-container {
+      position: sticky;
+      bottom: 0;
+      background: var(--card-bg);
+      padding: 12px 0 4px 0;
+      margin-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+      z-index: 10;
+    }
+
+    .btn-confirm {
+      width: 100%;
+      background: linear-gradient(135deg, #fbe8a6 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+      color: #121215;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-confirm:hover {
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+    }
+
+    .btn-confirm:active {
+      transform: scale(0.98);
+    }
+
+    /* ÉLÉMENTS DU PANIER DANS LE MODAL */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-light);
+    }
+
+    .cart-item-options {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .cart-item-price {
+      font-size: 0.85rem;
+      color: var(--gold-primary);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-qty {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--gold-primary);
+      background: none;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .btn-qty:active {
+      transform: scale(0.85);
+    }
+
+    /* PIED DE PAGE ET CONTACTS CLIQUABLES */
+    footer {
+      margin-top: 40px;
+      padding: 24px 16px;
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer-title {
+      font-size: 0.9rem;
+      color: var(--gold-primary);
+      font-weight: 700;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      font-size: 0.75rem;
+    }
+
+    .footer-card {
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .footer-card:hover {
+      border-color: var(--border-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .footer-card-title {
+      font-weight: 700;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+
+    .footer-card-phone {
+      color: var(--gold-primary);
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .footer-card-phone:active {
+      transform: scale(0.95);
+    }
+
+    /* KEYFRAMES ANIMATIONS GENERALES */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: translateY(50px) scale(0.9); }
+      60% { opacity: 1; transform: translateY(-5px) scale(1.02); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BANNIÈRE D'INSTALLATION PWA -->
+  <div class="pwa-install-banner" id="pwaBanner">
+    <span><i class="fa-solid fa-mobile-screen"></i> Installer l'application sur votre écran d'accueil ?</span>
+    <button class="btn-pwa-install" onclick="installPWA()">Installer</button>
+  </div>
+
+  <!-- EN-TÊTE PRINCIPAL -->
+  <header>
+    <div class="brand-container">
+      <div class="brand-logo">
+        <i class="fa-solid fa-utensils"></i>
+      </div>
+      <div class="brand-title">
+        <h1>CHAWARMA +</h1>
+        <p>Toujours plus</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- BOUTON D'INSTALLATION DANS L'EN-TÊTE -->
+      <button class="btn-header-install" id="headerInstallBtn" onclick="installPWA()" title="Installer l'application" style="display: none;">
+        <i class="fa-solid fa-download"></i>
+      </button>
+      <!-- BOUTON THÈME -->
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Basculer Mode Jour/Nuit">
+        <i class="fa-solid fa-sun"></i>
+      </button>
+      <!-- BADGE TABLE -->
+      <div class="table-badge" onclick="openTableModal()">
+        <i class="fa-solid fa-chair"></i>
+        <span id="currentTableDisplay">Table --</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BANNIÈRE INFO -->
+  <div class="info-banner">
+    <i class="fa-solid fa-location-dot" style="color: var(--gold-primary);"></i>
+    <strong>Point de vente :</strong> Angré 8ème tranche.<br>
+    Sélectionnez vos plats et envoyez votre commande directement en cuisine via WhatsApp.
+  </div>
+
+  <!-- VUE : LISTE DES CATÉGORIES (MOSAÏQUE) -->
+  <main id="categoriesView">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-border-all"></i> Nos Catégories</h2>
+    </div>
+    <div class="categories-grid" id="categoriesContainer"></div>
+  </main>
+
+  <!-- VUE : LISTE DES PRODUITS -->
+  <main id="productsView" class="view-products">
+    <button class="btn-back" onclick="showCategories()">
+      <i class="fa-solid fa-arrow-left"></i> Retour aux catégories
+    </button>
+    <div class="section-header" style="margin: 0 0 16px 0;">
+      <h2 class="section-title" id="currentCategoryTitle">Catégorie</h2>
+    </div>
+    <div id="productsContainer"></div>
+  </main>
+
+  <!-- BARRE FLOTTANTE DU PANIER -->
+  <div class="cart-bar" id="cartBar" onclick="openCartModal()" style="display: none;">
+    <div class="cart-info">
+      <div class="cart-badge" id="cartBadgeCount">0</div>
+      <div class="cart-text">
+        <span class="cart-title">Mon Panier</span>
+        <span class="cart-total" id="cartBarTotal">0 FCFA</span>
+      </div>
+    </div>
+    <div class="cart-action">
+      Commander <i class="fa-solid fa-arrow-right"></i>
+    </div>
+  </div>
+
+  <!-- MODAL D'ACCUEIL CHALEUREUX & SÉLECTION DE TABLE VIP -->
+  <div class="modal-overlay" id="tableModal">
+    <div class="modal-content" id="tableModalContent">
+      <div class="welcome-header">
+        <div class="welcome-badge-icon">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <div class="welcome-title">Bienvenue chez Chawarma +</div>
+        <div class="welcome-slogan">Toujours plus</div>
+        <p class="welcome-text">Pour nous permettre de vous offrir un service d'exception, indiquez-nous où vous êtes confortablement installé :</p>
+      </div>
+
+      <div class="options-grid" id="tableGrid" style="grid-template-columns: repeat(2, 1fr);"></div>
+
+      <!-- BOUTON FLOTTANT STICKY AVEC DÉFILEMENT AUTOMATIQUE -->
+      <div class="sticky-confirm-container" id="confirmWelcomeTableWrapper" style="display: none;">
+        <button class="btn-confirm" id="confirmWelcomeTableBtn" onclick="confirmWelcomeTable()">
+          <i class="fa-solid fa-sparkles"></i> Valider ma table & Découvrir la carte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL D'OPTIONS DE PRODUIT -->
+  <div class="modal-overlay" id="optionsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="optionModalTitle">Options du produit</span>
+        <button class="btn-close" onclick="closeOptionsModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="optionsModalBody"></div>
+      <button class="btn-confirm" onclick="confirmProductWithOptions()">Ajouter au panier</button>
+    </div>
+  </div>
+
+  <!-- MODAL DU PANIER -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Récapitulatif de la commande</span>
+        <button class="btn-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="cartItemsContainer"></div>
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-weight: 700;">
+        <span>Total :</span>
+        <span id="cartModalTotal" style="color: var(--gold-primary);">0 FCFA</span>
+      </div>
+      <button class="btn-confirm" onclick="sendOrderWhatsApp()" style="background: #25D366; color: #fff; margin-top: 16px;">
+        <i class="fa-brands fa-whatsapp"></i> Commander via WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- PIED DE PAGE & ADRESSES CLIQUABLES -->
+  <footer>
+    <div class="footer-title">Nos Adresses & Contacts</div>
+    <div class="footer-grid">
+      <div class="footer-card">
+        <div class="footer-card-title">Angré 8ème tranche</div>
+        <a href="tel:+2250759071911" class="footer-card-phone">
+          <i class="fa-solid fa-phone"></i> +225 07 59 07 19 11
+        </a>
+      </div>
+      <div class="footer-card">
+        <div class="footer-card-title">Angré 7ème tranche</div>
+        <a href="tel:+2250708906898" class="footer-card-phone">
+          <i class="fa-solid fa-phone"></i> +225 07 08 90 68 98
+        </a>
+      </div>
+      <div class="footer-card">
+        <div class="footer-card-title">Riviera Bonoumin</div>
+        <a href="tel:+2250797050536" class="footer-card-phone">
+          <i class="fa-solid fa-phone"></i> +225 07 97 05 05 36
+        </a>
+      </div>
+      <div class="footer-card">
+        <div class="footer-card-title">Cocody Cité SIR</div>
+        <a href="tel:+2250749407046" class="footer-card-phone">
+          <i class="fa-solid fa-phone"></i> +225 07 49 40 70 46
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // BASE DE DONNÉES DU MENU
+    const MENU_DATA = [
+      {
+        id: "chawarma",
+        name: "Nos Chawarmas",
+        icon: "fa-fire",
+        image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=500&q=80",
+        items: [
+          { id: "ch1", name: "Chawarma Stand", desc: "Mélange 3 choix servi en sandwich", price: 2500, image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=300&q=80" },
+          { id: "ch2", name: "Chawarma Plat", desc: "Mélange servi sur plat avec accompagnement", price: 5000, image: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=300&q=80" },
+          { id: "ch3", name: "Suprême", desc: "Chawarma spécialité du chef garni de fromage", price: 3000, image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=300&q=80" },
+          { id: "ch4", name: "Royal", desc: "Format géant multi-viandes avec frites", price: 6000, image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=300&q=80" }
+        ]
+      },
+      {
+        id: "rotisserie",
+        name: "Rôtisserie & Plats",
+        icon: "fa-drumstick-bite",
+        image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500&q=80",
+        items: [
+          { id: "ro1", name: "Poulet Complet + Frites", desc: "Rôti ou Braisé au choix", price: 9000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=300&q=80" },
+          { id: "ro2", name: "Poulet Entier Pané + Frites", desc: "Croustillant et doré au four", price: 9000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=300&q=80" },
+          { id: "ro3", name: "Demi-Poulet + Frites", desc: "Rôti ou Braisé au choix", price: 5000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=300&q=80" },
+          { id: "ro4", name: "1/2 Poulet Pané + Frites", desc: "Portion individuelle croustillante", price: 5000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1562967914-608f82629710?w=300&q=80" },
+          { id: "ro5", name: "Plat Krispy", desc: "Morceaux de poulet tendres et croustillants", price: 5000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300&q=80" },
+          { id: "ro6", name: "Steak à la Crème Fraîche", desc: "Bœuf tendre garni d'une crème riche", price: 6000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=300&q=80" },
+          { id: "ro7", name: "Plat Escalope", desc: "Panée ou à la crème au choix", price: 6000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=300&q=80" },
+          { id: "ro8", name: "Plat de Viande Grillée", desc: "Gésier, Taouk, Merguez au choix", price: 5000, hasMeatOptions: true, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300&q=80" },
+          { id: "ro9", name: "Plat de Frites", desc: "Portion généreuse dorée", price: 1500, image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300&q=80" }
+        ]
+      },
+      {
+        id: "sandwiches",
+        name: "Nos Sandwiches",
+        icon: "fa-burger",
+        image: "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=500&q=80",
+        items: [
+          { 
+            id: "sa1", 
+            name: "Sandwich Spécial", 
+            desc: "Fajita, Francisca, Mexicana, Poulet, Tex-Mex, Philadelphia", 
+            variants: [
+              { name: "Solo", price: 3000 },
+              { name: "Plat", price: 5000 }
+            ],
+            image: "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=300&q=80"
+          },
+          { id: "sa2", name: "Tacos Poulet ou Viande", desc: "Garni de frites et de sauce maison", price: 5000, image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300&q=80" }
+        ]
+      },
+      {
+        id: "salades",
+        name: "Salades & Mana'iche",
+        icon: "fa-utensils",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
+        items: [
+          { id: "sl1", name: "Entrée Mixte", desc: "Beyrouth, Taboulé, Fatouche", price: 5000, image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&q=80" },
+          { id: "sl2", name: "Salade Niçoise", desc: "Thon, œufs, légumes frais", price: 4000, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&q=80" },
+          { id: "sl3", name: "Mana'iche Fromage", desc: "Galette traditionnelle libanaise au fromage", price: 2500, image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&q=80" },
+          { id: "sl4", name: "Mana'iche Viande / Cocktail", desc: "Galette à la viande ou légumes", price: 2000, image: "https://images.unsplash.com/photo-1613564834361-9436948817d1?w=300&q=80" },
+          { id: "sl5", name: "Mana'iche Zaatar", desc: "Galette au thym et huile d'olive", price: 1000, image: "https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?w=300&q=80" }
+        ]
+      },
+      {
+        id: "pizzas",
+        name: "L'Atelier Pizzas",
+        icon: "fa-pizza-slice",
+        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&q=80",
+        items: [
+          {
+            id: "pz1",
+            name: "Pizza Classique au choix",
+            desc: "Royale, Mexicaine, Reine, Fajitas, Viande hachée, Chawarma, Margherita, Thon, Bolognaise...",
+            variants: [
+              { name: "Petite", price: 5000 },
+              { name: "Moyenne", price: 6000 },
+              { name: "Grande", price: 7000 }
+            ],
+            image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&q=80"
+          },
+          {
+            id: "pz2",
+            name: "Pizza 4 Saisons",
+            desc: "Champignons, poivrons, olives, artichauts",
+            variants: [
+              { name: "Moyenne", price: 6000 },
+              { name: "Grande", price: 7000 }
+            ],
+            image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300&q=80"
+          }
+        ]
+      },
+      {
+        id: "burgers",
+        name: "Burgers Gourmets",
+        icon: "fa-burger",
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80",
+        items: [
+          { id: "bg1", name: "Sandwich Burger", desc: "Pâté de bœuf classique grillé", price: 3000, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80" },
+          { id: "bg2", name: "Burger+", desc: "Bœuf, fromage fondant, œuf, frites", price: 4500, image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&q=80" },
+          { id: "bg3", name: "Chicken Breast / Double Cheese", desc: "Filet de poulet ou double cheddar", price: 5000, image: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=300&q=80" },
+          { id: "bg4", name: "Mushroom Burger", desc: "Nappé d'une crème aux champignons", price: 5000, image: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=300&q=80" },
+          { id: "bg5", name: "Zinger", desc: "Poulet ultra croustillant et épicé", price: 5000, image: "https://images.unsplash.com/photo-1610614819513-58e34989848b?w=300&q=80" },
+          { id: "bg6", name: "Big Burger", desc: "Double bœuf, fromages, œufs, frites", price: 8000, image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=300&q=80" }
+        ]
+      },
+      {
+        id: "desserts",
+        name: "Desserts & Douceurs",
+        icon: "fa-ice-cream",
+        image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=500&q=80",
+        items: [
+          { id: "ds1", name: "Crêpe+", desc: "Façon pasta, sauce chocolat, vanille", price: 4000, image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=300&q=80" },
+          { id: "ds2", name: "Crêpe Nutella", desc: "Génie de Nutella chaud et fondant", price: 3000, image: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=300&q=80" },
+          { id: "ds3", name: "Milkshake", desc: "Vanille, Chocolat, Fraise, Américain", price: 2000, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300&q=80" },
+          { id: "ds4", name: "Glace Double Scoop", desc: "2 boules artisanales au choix", price: 1000, image: "https://images.unsplash.com/photo-1560008511-11c63416e52d?w=300&q=80" }
+        ]
+      },
+      {
+        id: "boissons",
+        name: "Boissons Fraîches & Café",
+        icon: "fa-glass-water",
+        image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=500&q=80",
+        items: [
+          { id: "bs1", name: "Jus Naturel Maison / Energy Drink", desc: "Pressé à la commande", price: 1500, image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=300&q=80" },
+          { id: "bs2", name: "Sodas en Canette", desc: "Boisson gazeuse 33cl glacée", price: 1000, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300&q=80" },
+          { id: "bs3", name: "Café Expresso", desc: "Café torréfié intense", price: 1000, image: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300&q=80" },
+          { 
+            id: "bs4", 
+            name: "Eau Minérale", 
+            desc: "Eau de source bien fraîche", 
+            variants: [
+              { name: "Petite", price: 500 },
+              { name: "Grande", price: 1000 }
+            ],
+            image: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=300&q=80"
+          }
+        ]
+      }
+    ];
+
+    const MEAT_OPTIONS = ["Poulet", "Viande", "Rognon", "Langue", "Cœur", "Foie", "Cervelle", "Boulette", "Rosto", "Gésier", "Taouk", "Merguez", "Sojok"];
+
+    // ÉTAT DE L'APPLICATION
+    let currentTable = null;
+    let tempSelectedTable = null;
+    let cart = [];
+    let activeProductForOptions = null;
+    let selectedOptionVariant = null;
+    let selectedMeatOption = null;
+    let deferredPrompt = null;
+
+    // INITIALISATION
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initTableFromURL();
+      renderCategories();
+      setupServiceWorker();
+      setupPWAInstall();
+    });
+
+    // PROMPT D'INSTALLATION DE L'APPLICATION (PWA)
+    function setupPWAInstall() {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('pwaBanner').style.display = 'flex';
+        document.getElementById('headerInstallBtn').style.display = 'flex';
+      });
+
+      window.addEventListener('appinstalled', () => {
+        document.getElementById('pwaBanner').style.display = 'none';
+        document.getElementById('headerInstallBtn').style.display = 'none';
+        deferredPrompt = null;
+        console.log('Application Chawarma+ installée avec succès');
+      });
+    }
+
+    function installPWA() {
+      if (!deferredPrompt) {
+        alert("L'installation directe n'est pas prise en charge par ce navigateur ou l'application est déjà installée. Vous pouvez l'ajouter manuellement depuis le menu de votre navigateur.");
+        return;
+      }
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('Utilisateur a accepté l\'installation PWA');
+        }
+        document.getElementById('pwaBanner').style.display = 'none';
+        document.getElementById('headerInstallBtn').style.display = 'none';
+        deferredPrompt = null;
+      });
+    }
+
+    // MODE JOUR / NUIT
+    function initTheme() {
+      const savedTheme = localStorage.getItem('chawarma_theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        updateThemeIcon(true);
+      } else {
+        updateThemeIcon(false);
+      }
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-mode');
+      localStorage.setItem('chawarma_theme', isLight ? 'light' : 'dark');
+      updateThemeIcon(isLight);
+    }
+
+    function updateThemeIcon(isLight) {
+      const btn = document.getElementById('themeToggleBtn');
+      btn.innerHTML = isLight ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+    }
+
+    // GESTION DE LA TABLE
+    function initTableFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tableParam = urlParams.get('table');
+      if (tableParam && parseInt(tableParam) >= 1 && parseInt(tableParam) <= 20) {
+        setTable(parseInt(tableParam));
+      } else {
+        openTableModal();
+      }
+    }
+
+    function selectTempTable(tableNum) {
+      tempSelectedTable = tableNum;
+      document.querySelectorAll('.table-btn-animated').forEach((btn, idx) => {
+        if (idx + 1 === tableNum) {
+          btn.classList.add('selected');
+          btn.querySelector('.table-btn-sub').textContent = 'Installé ici ✨';
+        } else {
+          btn.classList.remove('selected');
+          btn.querySelector('.table-btn-sub').textContent = 'Vous installer';
+        }
+      });
+
+      const wrapper = document.getElementById('confirmWelcomeTableWrapper');
+      wrapper.style.display = 'block';
+
+      setTimeout(() => {
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function confirmWelcomeTable() {
+      if (tempSelectedTable) {
+        setTable(tempSelectedTable);
+      }
+    }
+
+    function setTable(tableNum) {
+      currentTable = tableNum;
+      tempSelectedTable = tableNum;
+      document.getElementById('currentTableDisplay').textContent = `Table ${tableNum}`;
+      closeTableModal();
+    }
+
+    function openTableModal() {
+      const grid = document.getElementById('tableGrid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 20; i++) {
+        const btn = document.createElement('button');
+        const isSelected = (currentTable === i) || (tempSelectedTable === i);
+        btn.className = `table-btn-animated ${isSelected ? 'selected' : ''}`;
+        btn.onclick = () => selectTempTable(i);
+        
+        btn.innerHTML = `
+          <div class="table-btn-number"><i class="fa-solid fa-chair" style="margin-right: 4px;"></i> Table ${i}</div>
+          <div class="table-btn-sub">${isSelected ? 'Installé ici ✨' : 'Vous installer'}</div>
+        `;
+        grid.appendChild(btn);
+      }
+      
+      const wrapper = document.getElementById('confirmWelcomeTableWrapper');
+      if (tempSelectedTable || currentTable) {
+        wrapper.style.display = 'block';
+      } else {
+        wrapper.style.display = 'none';
+      }
+
+      document.getElementById('tableModal').classList.add('active');
+    }
+
+    function closeTableModal() {
+      document.getElementById('tableModal').classList.remove('active');
+    }
+
+    // MOSAÏQUE DES CATÉGORIES
+    function renderCategories() {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = '';
+      MENU_DATA.forEach((cat, idx) => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.style.animationDelay = `${idx * 0.05}s`;
+        card.onclick = () => showProducts(cat.id);
+        card.innerHTML = `
+          <div class="category-img-wrapper">
+            <img src="${cat.image}" alt="${cat.name}">
+            <div class="category-img-overlay"></div>
+          </div>
+          <div class="category-info">
+            <div class="category-icon">
+              <i class="fa-solid ${cat.icon}"></i>
+            </div>
+            <div class="category-name">${cat.name}</div>
+            <div class="category-count">${cat.items.length} produits</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // LISTE DES PRODUITS AVEC ANIMATIONS
+    function showProducts(catId) {
+      const category = MENU_DATA.find(c => c.id === catId);
+      if (!category) return;
+
+      document.getElementById('currentCategoryTitle').textContent = category.name;
+      const container = document.getElementById('productsContainer');
+      container.innerHTML = '';
+
+      category.items.forEach((item, idx) => {
+        const pCard = document.createElement('div');
+        pCard.className = 'product-card';
+        pCard.style.animationDelay = `${idx * 0.05}s`;
+        
+        let priceDisplay = item.price ? `${item.price.toLocaleString()} FCFA` : `À partir de ${item.variants[0].price.toLocaleString()} FCFA`;
+
+        pCard.innerHTML = `
+          <img class="product-img" src="${item.image}" alt="${item.name}">
+          <div class="product-content">
+            <div>
+              <div class="product-title">${item.name}</div>
+              <div class="product-desc">${item.desc}</div>
+            </div>
+            <div class="product-action-row">
+              <div class="product-price">${priceDisplay}</div>
+              <button class="btn-add" onclick="handleAddItem('${category.id}', '${item.id}')">
+                <i class="fa-solid fa-plus"></i> Ajouter
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(pCard);
+      });
+
+      document.getElementById('categoriesView').style.display = 'none';
+      document.getElementById('productsView').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function showCategories() {
+      document.getElementById('productsView').style.display = 'none';
+      document.getElementById('categoriesView').style.display = 'block';
+    }
+
+    // GESTION DES OPTIONS ET DECLINAISONS
+    function handleAddItem(catId, itemId) {
+      const category = MENU_DATA.find(c => c.id === catId);
+      const item = category.items.find(i => i.id === itemId);
+
+      if (item.variants || item.hasMeatOptions) {
+        openOptionsModal(item);
+      } else {
+        addToCart({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          details: ''
+        });
+      }
+    }
+
+    function openOptionsModal(item) {
+      activeProductForOptions = item;
+      selectedOptionVariant = item.variants ? item.variants[0] : null;
+      selectedMeatOption = item.hasMeatOptions ? MEAT_OPTIONS[0] : null;
+
+      document.getElementById('optionModalTitle').textContent = item.name;
+      const body = document.getElementById('optionsModalBody');
+      body.innerHTML = '';
+
+      if (item.variants) {
+        const group = document.createElement('div');
+        group.className = 'option-group';
+        group.innerHTML = `<div class="option-title">Choisir la taille / option :</div>`;
+        const grid = document.createElement('div');
+        grid.className = 'options-grid';
+
+        item.variants.forEach((v, index) => {
+          const btn = document.createElement('button');
+          btn.className = `option-btn ${index === 0 ? 'selected' : ''}`;
+          btn.textContent = `${v.name} (${v.price.toLocaleString()} FCFA)`;
+          btn.onclick = () => {
+            grid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOptionVariant = v;
+          };
+          grid.appendChild(btn);
+        });
+        group.appendChild(grid);
+        body.appendChild(group);
+      }
+
+      if (item.hasMeatOptions) {
+        const group = document.createElement('div');
+        group.className = 'option-group';
+        group.innerHTML = `<div class="option-title">Choisir la viande :</div>`;
+        const grid = document.createElement('div');
+        grid.className = 'options-grid';
+
+        MEAT_OPTIONS.forEach((meat, index) => {
+          const btn = document.createElement('button');
+          btn.className = `option-btn ${index === 0 ? 'selected' : ''}`;
+          btn.textContent = meat;
+          btn.onclick = () => {
+            grid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedMeatOption = meat;
+          };
+          grid.appendChild(btn);
+        });
+        group.appendChild(grid);
+        body.appendChild(group);
+      }
+
+      document.getElementById('optionsModal').classList.add('active');
+    }
+
+    function closeOptionsModal() {
+      document.getElementById('optionsModal').classList.remove('active');
+    }
+
+    function confirmProductWithOptions() {
+      if (!activeProductForOptions) return;
+
+      let finalPrice = activeProductForOptions.price;
+      let detailsArr = [];
+
+      if (selectedOptionVariant) {
+        finalPrice = selectedOptionVariant.price;
+        detailsArr.push(selectedOptionVariant.name);
+      }
+
+      if (selectedMeatOption) {
+        detailsArr.push(`Viande: ${selectedMeatOption}`);
+      }
+
+      addToCart({
+        id: activeProductForOptions.id,
+        name: activeProductForOptions.name,
+        price: finalPrice,
+        details: detailsArr.join(' - ')
+      });
+
+      closeOptionsModal();
+    }
+
+    // GESTION DU PANIER
+    function addToCart(product) {
+      const existingKey = `${product.id}_${product.details}`;
+      const existing = cart.find(item => item.key === existingKey);
+
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          key: existingKey,
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          details: product.details,
+          qty: 1
+        });
+      }
+
+      updateCartBar();
+    }
+
+    function updateCartQty(key, delta) {
+      const item = cart.find(i => i.key === key);
+      if (item) {
+        item.qty += delta;
+        if (item.qty <= 0) {
+          cart = cart.filter(i => i.key !== key);
+        }
+      }
+      updateCartBar();
+      renderCartModalItems();
+    }
+
+    function updateCartBar() {
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+      const cartBar = document.getElementById('cartBar');
+      if (totalItems > 0) {
+        cartBar.style.display = 'flex';
+        document.getElementById('cartBadgeCount').textContent = totalItems;
+        document.getElementById('cartBarTotal').textContent = `${totalPrice.toLocaleString()} FCFA`;
+      } else {
+        cartBar.style.display = 'none';
+        closeCartModal();
+      }
+    }
+
+    function openCartModal() {
+      renderCartModalItems();
+      document.getElementById('cartModal').classList.add('active');
+    }
+
+    function closeCartModal() {
+      document.getElementById('cartModal').classList.remove('active');
+    }
+
+    function renderCartModalItems() {
+      const container = document.getElementById('cartItemsContainer');
+      container.innerHTML = '';
+
+      let totalPrice = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        totalPrice += itemTotal;
+
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.name}</div>
+            ${item.details ? `<div class="cart-item-options">${item.details}</div>` : ''}
+            <div class="cart-item-price">${item.price.toLocaleString()} FCFA</div>
+          </div>
+          <div class="qty-controls">
+            <button class="btn-qty" onclick="updateCartQty('${item.key}', -1)"><i class="fa-solid fa-minus"></i></button>
+            <span style="font-size: 0.85rem; font-weight:700;">${item.qty}</span>
+            <button class="btn-qty" onclick="updateCartQty('${item.key}', 1)"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('cartModalTotal').textContent = `${totalPrice.toLocaleString()} FCFA`;
+    }
+
+    // ENVOI WHATSAPP
+    function sendOrderWhatsApp() {
+      if (!currentTable) {
+        alert("Veuillez d'abord indiquer votre emplacement à notre équipe.");
+        openTableModal();
+        return;
+      }
+
+      if (cart.length === 0) return;
+
+      let message = `🍽️ *COMMANDE CHAWARMA + (Angré 8ème)*\n`;
+      message += `📍 *TABLE N° : ${currentTable}*\n`;
+      message += `--------------------------------\n\n`;
+
+      let total = 0;
+      cart.forEach(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        message += `▪️ *${item.qty}x ${item.name}*\n`;
+        if (item.details) {
+          message += `   _Option: ${item.details}_\n`;
+        }
+        message += `   Prix : ${subtotal.toLocaleString()} FCFA\n\n`;
+      });
+
+      message += `--------------------------------\n`;
+      message += `💰 *TOTAL A PAYER : ${total.toLocaleString()} FCFA*\n`;
+      message += `--------------------------------\n`;
+      message += `Merci de valider et préparer notre commande !`;
+
+      const whatsappURL = `https://wa.me/2250759071911?text=${encodeURIComponent(message)}`;
+      window.open(whatsappURL, '_blank');
+    }
+
+    // SERVICE WORKER INLINE
+    function setupServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        const swCode = `
+          self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
+        `;
+        const blob = new Blob([swCode], { type: 'text/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>
