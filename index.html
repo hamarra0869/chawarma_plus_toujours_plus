@@ -13,7 +13,7 @@
   <meta name="application-name" content="Chawarma+">
   <meta name="description" content="Application mobile de commande en ligne pour le restaurant Chawarma + (Angré 8ème tranche).">
 
-  <!-- MANIFEST INLINE (DATA URI ULTRA COMPLET) -->
+  <!-- MANIFEST INLINE (DATA URI COMPLET) -->
   <link rel="manifest" href="data:application/manifest+json;utf8,{
     %22name%22:%22Chawarma%20+%22,
     %22short_name%22:%22Chawarma+%22,
@@ -95,77 +95,6 @@
       color: var(--text-light);
       padding-bottom: 110px;
       overflow-x: hidden;
-    }
-
-    /* BANNIÈRE VIP D'INSTALLATION PWA SUR TÉLÉPHONE */
-    .pwa-install-banner {
-      background: linear-gradient(135deg, var(--card-bg), #1a1a20);
-      border-bottom: 2px solid var(--gold-primary);
-      color: var(--text-light);
-      padding: 12px 16px;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      animation: fadeInDown 0.4s ease forwards;
-    }
-
-    .pwa-banner-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pwa-banner-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: rgba(212, 175, 55, 0.15);
-      border: 1px solid var(--gold-primary);
-      color: var(--gold-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-
-    .pwa-banner-text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pwa-banner-title {
-      font-size: 0.82rem;
-      font-weight: 800;
-      color: var(--gold-primary);
-    }
-
-    .pwa-banner-sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .btn-pwa-action {
-      background: linear-gradient(135deg, #fbe8a6 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
-      color: #121215;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
-      transition: transform 0.2s ease;
-    }
-
-    .btn-pwa-action:active {
-      transform: scale(0.92);
     }
 
     /* EN-TÊTE PRINCIPAL */
@@ -930,16 +859,52 @@
       transform: scale(0.85);
     }
 
+    /* POP-UP INSTALLATION VIP (STYLE LUXE BOTTOM-SHEET) */
+    .pwa-popup-header {
+      text-align: center;
+      padding-bottom: 12px;
+    }
+
+    .pwa-popup-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(170, 124, 17, 0.05));
+      border: 1.5px solid var(--gold-primary);
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 12px auto;
+      box-shadow: var(--shadow-gold);
+    }
+
+    .pwa-popup-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--gold-primary);
+      margin-bottom: 4px;
+    }
+
+    .pwa-popup-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
     /* INSTRUCTIONS INSTALLATION IPHONE (iOS Safari) */
     .ios-instructions {
       background: var(--card-inner);
       border: 1px dashed var(--gold-primary);
       border-radius: 14px;
       padding: 14px;
-      margin-top: 14px;
+      margin-top: 10px;
       font-size: 0.8rem;
       color: var(--text-light);
       line-height: 1.5;
+      text-align: left;
     }
 
     .ios-instructions ol {
@@ -1046,20 +1011,6 @@
 </head>
 <body>
 
-  <!-- BANNIÈRE VIP D'INSTALLATION PWA DU TÉLÉPHONE -->
-  <div class="pwa-install-banner" id="pwaBanner">
-    <div class="pwa-banner-content">
-      <div class="pwa-banner-icon">
-        <i class="fa-solid fa-mobile-screen-button"></i>
-      </div>
-      <div class="pwa-banner-text">
-        <span class="pwa-banner-title">Installer Chawarma +</span>
-        <span class="pwa-banner-sub">Accès instantané depuis votre écran d'accueil</span>
-      </div>
-    </div>
-    <button class="btn-pwa-action" onclick="triggerPWAInstall()">Installer</button>
-  </div>
-
   <!-- EN-TÊTE PRINCIPAL -->
   <header>
     <div class="brand-container">
@@ -1073,7 +1024,7 @@
     </div>
     <div class="header-actions">
       <!-- BOUTON D'INSTALLATION DANS L'EN-TÊTE HEADER -->
-      <button class="btn-header-install" id="headerInstallBtn" onclick="triggerPWAInstall()" title="Installer l'application sur votre téléphone">
+      <button class="btn-header-install" id="headerInstallBtn" onclick="openPWAModal()" title="Installer l'application sur votre téléphone">
         <i class="fa-solid fa-download"></i>
       </button>
       <!-- BOUTON THÈME -->
@@ -1151,20 +1102,23 @@
     </div>
   </div>
 
-  <!-- MODAL D'INSTALLATION PWA (SURTOUT SUR IPHONE/IOS) -->
+  <!-- POP-UP MODALE VIP D'INSTALLATION PWA -->
   <div class="modal-overlay" id="pwaModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <span class="modal-title"><i class="fa-solid fa-mobile-screen"></i> Installer sur votre téléphone</span>
+      <div class="modal-header" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+        <span></span>
         <button class="btn-close" onclick="closePWAModal()"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div id="pwaModalBody">
-        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-          Installez l'application <strong>Chawarma +</strong> sur l'écran d'accueil de votre téléphone pour y accéder rapidement sans passer par un navigateur web.
+      <div class="pwa-popup-header">
+        <div class="pwa-popup-icon">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <div class="pwa-popup-title">L'Expérience "Toujours Plus"</div>
+        <p class="pwa-popup-text">
+          Ajoutez <strong>Chawarma +</strong> à l'écran d'accueil de votre téléphone pour accéder directement à la carte et commander en 1 clic.
         </p>
-        <div id="pwaDynamicGuide"></div>
+        <div id="pwaDynamicContent"></div>
       </div>
-      <button class="btn-confirm" onclick="closePWAModal()" style="margin-top: 16px;">Compris</button>
     </div>
   </div>
 
@@ -1382,6 +1336,7 @@
     let selectedOptionVariant = null;
     let selectedMeatOption = null;
     let deferredPrompt = null;
+    let hasPromptedPWA = false;
 
     // INITIALISATION
     window.addEventListener('DOMContentLoaded', () => {
@@ -1392,84 +1347,78 @@
       setupPWAInstall();
     });
 
-    // GESTION DU PROMPT ET DE L'INSTALLATION NATIVE PWA SUR TÉLÉPHONE
+    // MOTEUR D'INSTALLATION PWA PAR POP-UP ÉLÉGANTE
     function setupPWAInstall() {
-      // Détecter si l'application est déjà lancée en mode App autonome
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-      if (isStandalone) {
-        document.getElementById('pwaBanner').style.display = 'none';
-        document.getElementById('headerInstallBtn').style.display = 'none';
-        return;
-      }
-
-      // Android / Chrome
+      // Capturer l'événement natif Chrome/Android
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        document.getElementById('pwaBanner').style.display = 'flex';
       });
 
-      // App installée avec succès
       window.addEventListener('appinstalled', () => {
-        document.getElementById('pwaBanner').style.display = 'none';
         deferredPrompt = null;
-        console.log('App Chawarma+ installée avec succès !');
+        closePWAModal();
+        console.log('Chawarma+ est désormais installée !');
       });
-
-      // Si iOS Safari (qui ne prend pas en charge beforeinstallprompt)
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      if (isIOS && !isStandalone) {
-        document.getElementById('pwaBanner').style.display = 'flex';
-      }
     }
 
-    function triggerPWAInstall() {
+    function openPWAModal() {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone) {
+        alert("L'application Chawarma + est déjà installée sur votre écran d'accueil.");
+        return;
+      }
+
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const contentDiv = document.getElementById('pwaDynamicContent');
 
       if (deferredPrompt) {
-        // Installation Android / Chrome / Windows / Mac
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choice) => {
-          if (choice.outcome === 'accepted') {
-            document.getElementById('pwaBanner').style.display = 'none';
-          }
-          deferredPrompt = null;
-        });
+        // Mode Android / Desktop : Clic direct vers l'installateur officiel
+        contentDiv.innerHTML = `
+          <button class="btn-confirm" onclick="triggerDirectInstall()">
+            <i class="fa-solid fa-download"></i> Installer l'application
+          </button>
+        `;
       } else if (isIOS) {
-        // Guide visuel iOS Safari
-        openPWAModal('ios');
-      } else {
-        // Guide universel
-        openPWAModal('generic');
-      }
-    }
-
-    function openPWAModal(type) {
-      const container = document.getElementById('pwaDynamicGuide');
-      if (type === 'ios') {
-        container.innerHTML = `
+        // Mode iOS (Safari iPhone)
+        contentDiv.innerHTML = `
           <div class="ios-instructions">
-            <strong>Pour installer sur iPhone / iPad :</strong>
+            <strong>Comment installer sur votre iPhone :</strong>
             <ol>
-              <li>Appuyez sur le bouton <strong>Partager</strong> <i class="fa-solid fa-arrow-up-from-bracket" style="color:var(--gold-primary);"></i> au bas de votre navigateur Safari.</li>
-              <li>Faites défiler vers le bas et sélectionnez <strong>Sur l'écran d'accueil</strong> <i class="fa-regular fa-square-plus" style="color:var(--gold-primary);"></i>.</li>
-              <li>Confirmez en appuyant sur <strong>Ajouter</strong> en haut à droite.</li>
+              <li>Appuyez sur le bouton <strong>Partager</strong> <i class="fa-solid fa-arrow-up-from-bracket" style="color:var(--gold-primary);"></i> au bas de Safari.</li>
+              <li>Sélectionnez <strong>Sur l'écran d'accueil</strong> <i class="fa-regular fa-square-plus" style="color:var(--gold-primary);"></i>.</li>
+              <li>Appuyez sur <strong>Ajouter</strong>.</li>
             </ol>
           </div>
+          <button class="btn-confirm" onclick="closePWAModal()" style="margin-top: 14px;">Compris</button>
         `;
       } else {
-        container.innerHTML = `
+        // Navigateur générique sans prompt disponible
+        contentDiv.innerHTML = `
           <div class="ios-instructions">
-            <strong>Pour installer l'application :</strong>
+            <strong>Pour ajouter à l'écran d'accueil :</strong>
             <ol>
               <li>Ouvrez le menu de votre navigateur (3 petits points <i class="fa-solid fa-ellipsis-vertical"></i>).</li>
-              <li>Appuyez sur <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.</li>
+              <li>Sélectionnez <strong>« Ajouter à l'écran d'accueil »</strong>.</li>
             </ol>
           </div>
+          <button class="btn-confirm" onclick="closePWAModal()" style="margin-top: 14px;">Compris</button>
         `;
       }
+
       document.getElementById('pwaModal').classList.add('active');
+    }
+
+    function triggerDirectInstall() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+          console.log('Prompt accepté par l\'utilisateur');
+        }
+        deferredPrompt = null;
+        closePWAModal();
+      });
     }
 
     function closePWAModal() {
@@ -1532,6 +1481,15 @@
     function confirmWelcomeTable() {
       if (tempSelectedTable) {
         setTable(tempSelectedTable);
+        
+        // PROPOSER LA POP-UP PWA UNE SEULE FOIS APRÈS LA CONFIRMATION DE TABLE
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (!hasPromptedPWA && !isStandalone) {
+          hasPromptedPWA = true;
+          setTimeout(() => {
+            openPWAModal();
+          }, 800);
+        }
       }
     }
 
